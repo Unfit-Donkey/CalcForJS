@@ -1,0 +1,63 @@
+body {
+    margin:0px;
+    text-align:center;
+}
+#inputContainer {
+    text-align:center;
+    padding-top:10px;
+    width:inherit;
+    max-width:90%;
+    content:" ";
+    display:inline-block;
+    box-sizing:border-box;
+    position:fixed;
+}
+#input {
+    transition: 0.5s all;
+    opacity:1;
+    font-family:"Roboto Mono";
+    font-size:2em;
+    box-shadow: 1px 1px 6px 1px #00000033;
+    outline:none;
+    background:#FEFEFE;
+    border:none;
+    border-radius:10px;
+    padding:0.2 em;
+    position:sticky;
+    top:0;
+    width:100%;
+    box-sizing:border-box;
+}
+#input:focus {
+    box-shadow: 1px 1px 8px 1px #00000044;
+}
+#box {
+    text-align:left;
+    display:inline-block;
+    width:40em;
+    max-width:90%;
+    box-sizing:border-box;
+    margin:0 auto;
+    height:100vh;
+}
+#output {
+    font-family:"Roboto Mono";
+    padding-top:10px;
+    text-align:left;
+    margin-top:3.5em;
+    display:inline-block;
+    font-size:1.2em;
+}
+.error {
+    color:#aa0000;
+}
+#graph {
+    filter:blur(0.2px);
+    position:absolute;
+    pointer-events:none;
+    top:0;
+    left:0;
+}
+.histItem {
+    margin-bottom:0.5em;
+}

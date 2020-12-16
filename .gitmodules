@@ -1,0 +1,3 @@
+[submodule "CalcCLI"]
+	path = CalcCLI
+	url = https://github.com/Unfit-Donkey/CalcCLI

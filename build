@@ -1,0 +1,5 @@
+#!/bin/bash
+emcc CalcCLI/Calc.c CalcWASM.cpp --bind -o CalcWASM.js
+
+
+
