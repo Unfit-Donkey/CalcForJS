@@ -3,30 +3,36 @@ body {
     text-align:center;
 }
 #inputContainer {
-    text-align:center;
     padding-top:10px;
-    width:inherit;
-    max-width:90%;
-    content:" ";
+    width:100%;
     display:inline-block;
     box-sizing:border-box;
-    position:fixed;
+    max-width:100%;
+}
+.mobile > #boxwrapper > #inputContainer {
+    padding-top:0px;
 }
 #input {
-    transition: 0.5s all;
     opacity:1;
     font-family:"Roboto Mono";
     font-size:2em;
-    box-shadow: 1px 1px 6px 1px #00000033;
+    box-shadow: 1px 1px 6px 1px #88888855;
     outline:none;
     background:#FEFEFE;
     border:none;
     border-radius:10px;
-    padding:0.2 em;
+    padding:0.1em;
     position:sticky;
     top:0;
     width:100%;
     box-sizing:border-box;
+    -moz-box-sizing:border-box;
+}
+.mobile > #boxwrapper > #inputContainer > #input {
+    border-radius:0px;
+    box-shadow: 0px 6px 4px -4px #88888855;
+    width:100%;
+    max-width:100%;
 }
 #input:focus {
     box-shadow: 1px 1px 8px 1px #00000044;
@@ -34,19 +40,32 @@ body {
 #box {
     text-align:left;
     display:inline-block;
-    width:40em;
-    max-width:90%;
-    box-sizing:border-box;
-    margin:0 auto;
     height:100vh;
+    box-sizing:content-box;
+    position:fixed;
+    right:0px;
+}
+#boxwrapper {
+    margin: 0 auto;
+    max-width:40em;
+    box-sizing:content-box;
+    max-height:100vh;
+    overflow-y:auto;
+}
+.mobile > #boxwrapper {
+    max-width:100%;
 }
 #output {
+    overflow-y:auto;
     font-family:"Roboto Mono";
     padding-top:10px;
     text-align:left;
-    margin-top:3.5em;
+    margin-top:0.5em;
     display:inline-block;
     font-size:1.2em;
+    margin-left:5%;
+    width:88%;
+    overflow-wrap:break-word;
 }
 .error {
     color:#aa0000;
@@ -60,4 +79,84 @@ body {
 }
 .histItem {
     margin-bottom:0.5em;
+}
+#panel {
+    padding:1em;
+    width:35vw;
+    min-width:4in;
+    max-width:30em;
+    font-family:"Roboto Mono";
+    position:fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    background:#FEFEFE;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    text-align:left;
+    box-shadow: 1px 1px 10px 5px #EEE;
+    display:none;
+}
+.panelPage {
+    width:100%;
+    height:100%;
+    display:none;
+    overflow-y:auto;
+}
+#helpSearchBox {
+    width:100%;
+}
+.searchResultTags {
+    float:right;
+    font-size:0.5em;
+    text-align:right;
+}
+.buttonList > button {
+    width:100%;
+    display:block;
+    border:none;
+    border-bottom: #88888888 1px dashed;
+    background:#FFFFFF;
+    text-align:left;
+    font-size:1.25em;
+    outline:none;
+    font-family:Roboto Mono;
+}
+.buttonList > button:hover {
+    background:#88888833;
+}
+.buttonList > button:focus {
+    background:#88888844;
+}
+.tableborder {
+    border-collapse:collapse;
+}
+.tableborder > tbody > tr > td {
+    border:#88888844 1px solid;
+    padding:2px;
+}
+.tableborder > thead > tr > td {
+    border:#88888844 1px solid;
+    padding:2px;
+    font-weight:bold;
+}
+.menuOpenButton {
+    font-size:1.5em;
+    font-weight:bold;
+    width:1.5em;
+    height:1.5em;
+    background:#88888833;
+    border:none;
+    text-align:center;
+    padding:0px;
+    margin:0px;
+}
+.menuOpenButton:hover {
+    background:#88888855;
+}
+#menubuttons {
+    position:fixed;
+    right:0;
+    bottom:0;
+    border-radius:10px 0 0 0;
 }
