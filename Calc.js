@@ -21,6 +21,7 @@ const helpPanel = [
     {name: "-base", type: 1, content: "<strong>-base</strong> returns a number converte to a different base.<br>Syntax:<br>-base{ret} {exp}<br><br>Examples:<br><ul><li>-base2 100 = 1100100</li><li>-base3 10 = 101</li></ul>The return type can be any integer from 2 to 36."},
     {name: "-unit", type: 1, content: "Return the second argument converted to the first input.<br>Syntax:<br>-unit{dest} {exp}.<br><br>Examples:<br><ul><li>-unit[psi] [atm] = 14.69... [psi]</li><li>-unit[mi/s] [c] = 186282.397... [mi/s]</li></ul>For the first argument, the square brackets are not required, but it looks messy."},
     {name: "-g", type: 1, tags: ["graph"], content: "-g is in experimental mode, do not use it"},
+    {name: "-help",type:1, content: "<strong>-help {name}</strong> opens the help page that most closely resembles name. If no name is provided, the main help menu is opened."},
     {name: "i", type: 2, tags: ["imaginary number"], content: "<strong>i</strong> is the imaginary number, equal to the square root of -1."},
     {name: "neg", type: 2, tags: ["negate", "negative"], content: "<strong>neg(a)</strong> returns the negative of a. It is identical to -a.", arguments: ["a"]},
     {name: "pow", type: 2, tags: ["exponent", "power"], content: "<strong>pow(a,b)</strong> returns a to the power of b. <em>pow(a,b)</em> is equivalent to a^b.", arguments: ["a", "b"]},
@@ -204,10 +205,10 @@ class helpSearchResult {
     }
 }
 /**
- * Commits a search and changes the HTML of the search results to the list
+ * Commits a search and changes the HTML of the search results to the list, if gotoAuto is true, automatically go to the best result.
 */
-function helpSearch(input, event = null) {
-    input=input.toLowerCase();
+function helpSearch(input, event = null, gotoAuto = false) {
+    input = input.toLowerCase();
     //Check for escape key or enter key
     if(event != null) {
         if(event.key == "Escape") {
@@ -215,7 +216,7 @@ function helpSearch(input, event = null) {
         }
         if(event.key == "Enter") {
             let list = document.getElementsByClassName("searchResult");
-            if(list.length < 0) return;
+            if(list.length == 0) return;
             list[0].click();
             return;
         }
@@ -235,7 +236,7 @@ function helpSearch(input, event = null) {
     for(let i = 0; i < helpPanel.length; i++) {
         let page = helpPanel[i];
         let tags = page.tags;
-        let pageName=page.name.toLowerCase();
+        let pageName = page.name.toLowerCase();
         if(input == pageName) results.push(new helpSearchResult(i, 0));
         else if(pageName.startsWith(input)) results.push(new helpSearchResult(i, 1));
         else if(pageName.includes(input)) results.push(new helpSearchResult(i, 2));
@@ -257,6 +258,14 @@ function helpSearch(input, event = null) {
             //Push to list and set flag to one
             outList.push(results[i]);
             itemSet[Math.floor(results[i].id / 32)] |= 1 >> (results[i].id % 32);
+        }
+    }
+    if(gotoAuto) {
+        if(outList.length == 0) {
+            appendHistory("-help " + input, "Error: no help page found for '" + input + "'");
+        }
+        else {
+            openHelp(helpPanel[outList[0].id].name);
         }
     }
     //Compile HTML
@@ -385,7 +394,8 @@ function openPanel(open = true) {
 }
 function inputOnEnter() {
     var input = document.getElementById("input");
-    appendHistory(input.value, Module.runLine(input.value.toString()));
+    let out = Module.runLine(input.value.toString());
+    if(out != "") appendHistory(input.value, out);
     input.value = "";
 }
 function keyUp(event) {

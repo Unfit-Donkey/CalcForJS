@@ -9,16 +9,16 @@ std::string errorMessage;
 extern "C" {
     extern void error(const char* format, ...) {
         //Print error
-        char* dest=(char*)calloc(256,1);
+        char* dest = (char*)calloc(256, 1);
         va_list argptr;
         va_start(argptr, format);
         vsnprintf(dest, 255, format, argptr);
         va_end(argptr);
         //Set error to true
         globalError = true;
-        errorMessage = "Error: "+std::string(dest);
+        errorMessage = "Error: " + std::string(dest);
         free(dest);
-        emscripten_run_script(("console.log(\""+errorMessage+"\");").c_str());
+        emscripten_run_script(("console.log(\"" + errorMessage + "\");").c_str());
     };
 }
 void error(std::string message) {
@@ -73,9 +73,9 @@ std::string eqToWebGL(std::string eq) {
     GLScript = "";
     aVal = 0;
     char* eqChar = copyString(eq);
-    char** x = (char**)calloc(2,sizeof(char*));
-    x[0]=(char*)calloc(2,1);
-    x[0][0]='x';
+    char** x = (char**)calloc(2, sizeof(char*));
+    x[0] = (char*)calloc(2, 1);
+    x[0][0] = 'x';
     Tree tree = generateTree(eqChar, x, 0);
     free(eqChar);
     free(x);
@@ -159,9 +159,9 @@ std::string runLineJS(std::string line) {
                 globalError = false;
                 return errorMessage;
             }
-            char** x=(char**)calloc(2,sizeof(char**));
-            x[0]=(char*)calloc(2,1);
-            x[0][0]='x';
+            char** x = (char**)calloc(2, sizeof(char**));
+            x[0] = (char*)calloc(2, 1);
+            x[0][0] = 'x';
             Tree ops = generateTree(cleanInput, x, 0);
             free(cleanInput);
             Tree cleanedOps = treeCopy(ops, NULL, true, false, true);
@@ -227,6 +227,16 @@ std::string runLineJS(std::string line) {
             freeValue(value);
             freeValue(out);
             return outString;
+        }
+        else if(input[1] == 'h' && input[2] == 'e' && input[3] == 'l' && input[4] == 'p') {
+            if(input[5] == ' ') {
+                std::string call=("helpSearch(\"" + std::string(input).substr(6) + "\",null,true)");
+                emscripten_run_script(("console.log('"+call+"');").c_str());
+                emscripten_run_script(call.c_str());
+                return "";
+            }
+            emscripten_run_script("openPanelPage(0)");
+            return "";
         }
         else {
             return "Error: command not recognized.";
