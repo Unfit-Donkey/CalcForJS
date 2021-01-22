@@ -2,6 +2,11 @@ body {
     margin:0px;
     text-align:center;
 }
+button {
+    box-shadow: 1px 1px 3px 0px #00000033;
+    border-radius:3px;
+    border:none;
+}
 #inputContainer {
     padding-top:10px;
     width:100%;
@@ -16,7 +21,7 @@ body {
     opacity:1;
     font-family:"Roboto Mono";
     font-size:2em;
-    box-shadow: 1px 1px 6px 1px #88888855;
+    box-shadow: 1px 1px 6px 1px #00000055;
     outline:none;
     background:#FEFEFE;
     border:none;
@@ -30,12 +35,12 @@ body {
 }
 .mobile > #boxwrapper > #inputContainer > #input {
     border-radius:0px;
-    box-shadow: 0px 6px 4px -4px #88888855;
+    box-shadow: 0px 6px 4px -4px #00000055;
     width:100%;
     max-width:100%;
 }
 #input:focus {
-    box-shadow: 1px 1px 8px 1px #00000044;
+    box-shadow: 1px 1px 8px 1px #00000077;
 }
 #box {
     text-align:left;
@@ -94,7 +99,7 @@ body {
     box-sizing:border-box;
     -moz-box-sizing:border-box;
     text-align:left;
-    box-shadow: 1px 1px 10px 5px #EEE;
+    box-shadow: 1px 1px 10px 5px #00000033;
     display:none;
 }
 .panelPage {
@@ -105,22 +110,34 @@ body {
 }
 #helpSearchBox {
     width:100%;
+    border-radius:5px;
+    padding:5px;
+    box-shadow: 2px 1px 5px 0px #00000033;
+    margin:3px 0px 3px 0px;
+    border:none;
 }
 .searchResultTags {
     float:right;
     font-size:0.5em;
     text-align:right;
 }
+.buttonList {
+    border-radius:5px;
+    overflow:hidden;
+}
 .buttonList > button {
     width:100%;
     display:block;
     border:none;
-    border-bottom: #88888888 1px dashed;
     background:#FFFFFF;
     text-align:left;
     font-size:1.25em;
     outline:none;
     font-family:Roboto Mono;
+    border-radius:0px;
+}
+.buttonList > button:not(:last-child) {
+    border-bottom: #88888888 1px dashed;
 }
 .buttonList > button:hover {
     background:#88888833;
@@ -148,8 +165,14 @@ body {
     background:#88888833;
     border:none;
     text-align:center;
+    vertical-align:bottom;
     padding:0px;
     margin:0px;
+    border-radius:0px;
+    box-shadow:none;
+}
+.menuOpenButton:not(:first-child) {
+    border-left: #00000044 1px dashed;
 }
 .menuOpenButton:hover {
     background:#88888855;
@@ -159,4 +182,10 @@ body {
     right:0;
     bottom:0;
     border-radius:10px 0 0 0;
+    vertical-align:bottom;
+    overflow:hidden;
+    box-shadow:-1px -1px 3px 0px #00000033;
+}
+a {
+    text-decoration:none;
 }

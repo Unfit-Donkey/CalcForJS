@@ -1,0 +1,36 @@
+*:not(a) {
+    color:#FFF;
+}
+body {
+    background:#222;
+}
+#input {
+    background:#282828;
+}
+#panel {
+    background:#282828;
+}
+.buttonList > button {
+    background: #333;
+}
+#helpSearchBox {
+    background: #333;
+}
+button {
+    background:#333;
+}
+a {
+    color: #3333EE;
+}
+a:visited {
+    color:#772F9B;
+}
+a:hover {
+    color:#4444FF;
+}
+a:visited:hover {
+    color:#993ACB;
+}
+.svgpath {
+    fill:#FFF;
+}

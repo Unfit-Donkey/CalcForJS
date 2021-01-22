@@ -227,7 +227,7 @@ function helpSearch(input, event = null, gotoAuto = false) {
     let search = document.getElementById("helpSearch");
     if(search.style.display != "block") openPanelPage(2);
     if(search.children[1]) search.children[1].focus();
-    search = search.children[2];
+    search = search.children[3];
     //Show mesage if no input
     if(input.length == 0) {
         search.innerHTML = "Type an expression to search.";
@@ -379,6 +379,10 @@ function openPanelPage(id) {
     let newActiveList = pages[id].getElementsByClassName("buttonList")[0]
     if(newActiveList) newActiveList.classList.add("activeList");
     if(!panelIsOpen) openPanel(true);
+    //Retrieve settings
+    if(id == 3) {
+        document.getElementById("setting-darkMode").value = getSetting("useDarkMode");
+    }
 }
 var panelIsOpen = false;
 var panelPage = -1;
@@ -475,6 +479,27 @@ function appendHistory(input, outputText) {
     //append to document
     document.getElementById("output").prepend(hist);
 }
+function settingsLoad() {
+    for(let i in settingDefaults) {
+        setSetting(i, getSetting(i));
+    }
+}
+function setSetting(name, value) {
+    localStorage.setItem(name, value);
+    if(name == "useDarkMode") {
+        value=eval(value);
+        document.getElementById("colorScheme").href=value?"style/dark.css":"";
+        document.getElementById("setting-darkMode").checked=value;
+    }
+}
+const settingDefaults = {
+    "useDarkMode": false,
+};
+function getSetting(name) {
+    let out = localStorage.getItem(name);
+    if(typeof out === "undefined" || out == "undefined") return settingDefaults[name];
+    else return out;
+}
 //Graphing
 var gl;
 var graphs = [];
@@ -563,4 +588,5 @@ onload = function () {
     output = document.getElementById("output");
     graph = document.getElementById("graph");
     boxResize();
+    settingsLoad();
 }
