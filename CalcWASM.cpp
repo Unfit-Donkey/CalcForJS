@@ -239,6 +239,18 @@ std::string runLineJS(std::string line) {
             emscripten_run_script("openPanelPage(0)");
             return "";
         }
+        else if(input[1] == 'p' && input[2] == 'a' && input[3] == 'r' && input[4] == 's' && input[5] == 'e') {
+            char* cleanInput = inputClean(input+6);
+            Tree tree=generateTree(cleanInput,nullptr,0.0);
+            free(cleanInput);
+            if(globalError) return errorMessage;
+            char* outStr = treeToString(tree,false, nullptr);
+            freeTree(tree);
+            if(globalError) return errorMessage;
+            std::string outStdStr = std::string(outStr);
+            free(outStr);
+            return outStdStr;
+        }
         else {
             return "Error: command not recognized.";
         }
@@ -258,7 +270,7 @@ std::string runLineJS(std::string line) {
                 int brackets = 0;
                 while(true) {
                     j++;
-                    if(input[j]=='\0') return "Error: no ending bracket";
+                    if(input[j] == '\0') return "Error: no ending bracket";
                     if(input[j] == '(') brackets++;
                     if(input[j] == ')') {
                         brackets--;
@@ -291,8 +303,8 @@ std::string runLineJS(std::string line) {
                 }
                 strcpy(out + outLen, varStr);
                 free(varStr);
-                i=endBracket;
-                outLen+=varStrLen;
+                i = endBracket;
+                outLen += varStrLen;
             }
             else {
                 //Resize allocated area if necessary
