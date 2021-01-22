@@ -89,6 +89,7 @@ std::string runLineJS(std::string line) {
     char* input = copyString(line);
     int i;
     globalError = false;
+    //Commands
     if(input[0] == '-') {
         if(input[1] == 'd' && input[2] == 'e' && input[3] == 'f' && input[4] == ' ') {
             //Define function
@@ -230,8 +231,8 @@ std::string runLineJS(std::string line) {
         }
         else if(input[1] == 'h' && input[2] == 'e' && input[3] == 'l' && input[4] == 'p') {
             if(input[5] == ' ') {
-                std::string call=("helpSearch(\"" + std::string(input).substr(6) + "\",null,true)");
-                emscripten_run_script(("console.log('"+call+"');").c_str());
+                std::string call = ("helpSearch(\"" + std::string(input).substr(6) + "\",null,true)");
+                emscripten_run_script(("console.log('" + call + "');").c_str());
                 emscripten_run_script(call.c_str());
                 return "";
             }
@@ -242,6 +243,73 @@ std::string runLineJS(std::string line) {
             return "Error: command not recognized.";
         }
         return "Error: internal - control flow error";
+    }
+    //Comments
+    if((input[0] == '/' && input[1] == '/') || input[0] == '#') {
+        long outSize = 100;
+        char* out = (char*)calloc(100, 1);
+        int outLen = 0;
+        if(out == nullptr) return "Error: Malloc returned nullptr";
+        int i = -1;
+        while(input[++i] != '\0') {
+            if(input[i] == '$' && input[i + 1] == '(') {
+                //Find endBracket
+                int j = i, endBracket = 0;
+                int brackets = 0;
+                while(true) {
+                    j++;
+                    if(input[j]=='\0') return "Error: no ending bracket";
+                    if(input[j] == '(') brackets++;
+                    if(input[j] == ')') {
+                        brackets--;
+                        if(brackets == 0) {
+                            endBracket = j;
+                            break;
+                        }
+                    }
+                }
+                if(endBracket == 0) return "Error: no ending bracket";
+                i += 2;
+                //i is on the start bracket, endBracket is on the closing bracket
+                //Copy expression
+                int expLen = endBracket - i;
+                char expression[expLen + 1];
+                expression[expLen] = '\0';
+                memcpy(expression, input + i, expLen);
+                //Evaluate expression
+                Value var = calculate(expression, 0);
+                if(globalError) return errorMessage;
+                char* varStr = valueToString(var, 10.0);
+                freeValue(var);
+                //Copy to out
+                int varStrLen = strlen(varStr);
+                if(outLen + varStrLen > outSize - 3) {
+                    out = (char*)realloc(out, outLen + varStrLen + 50);
+                    if(out == nullptr) return "Error: Malloc returned nullptr";
+                    memset(out + outSize, 0, outLen + varStrLen + 50 - outSize);
+                    outSize = outLen + varStrLen + 50;
+                }
+                strcpy(out + outLen, varStr);
+                free(varStr);
+                i=endBracket;
+                outLen+=varStrLen;
+            }
+            else {
+                //Resize allocated area if necessary
+                if(outLen == outSize - 2) {
+                    out = (char*)realloc(out, outSize + 50);
+                    if(out == nullptr) return "Error: Malloc returne nullptr";
+                    memset(out + outSize, 0, 50);
+                    outSize += 50;
+                }
+                //Copy character
+                outLen++;
+                out[outLen - 1] = input[i];
+            }
+        }
+        std::string ret = std::string(out);
+        free(out);
+        return ret;
     }
     //Else compute it as a value
     else {
