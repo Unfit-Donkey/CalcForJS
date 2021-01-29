@@ -515,7 +515,7 @@ function setSetting(name, value) {
     }
 }
 const settingDefaults = {
-    "useDarkMode": false,
+    "useDarkMode": true,
     "syntaxHighlight": true,
 };
 var settingCache = {};
