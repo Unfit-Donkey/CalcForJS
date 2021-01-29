@@ -415,9 +415,14 @@ function openPanel(open = true) {
     boxResize();
 }
 function inputOnEnter() {
+    try {
     let out = Module.runLine(getInputText());
     if(out != "") appendHistory(input.innerHTML, out);
     input.innerText = "";
+    }
+    catch (e) {
+        appendHistory(input.innerHTML,"Error: A segmentation fault has been reached. Please reload the page. If you would like to, consider reporting it <a href='https://github.com/Unfit-Donkey/CalcForJS/issues'>here</a>.");
+    }
     inputSyntax();
 }
 function keyUp(event) {
