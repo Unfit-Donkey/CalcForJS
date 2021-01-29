@@ -8,6 +8,7 @@ using namespace emscripten;
 std::string errorMessage;
 extern "C" {
     extern void error(const char* format, ...) {
+        if(ignoreError) return;
         //Print error
         char* dest = (char*)calloc(256, 1);
         va_list argptr;
@@ -22,6 +23,7 @@ extern "C" {
     };
 }
 void error(std::string message) {
+    if(ignoreError) return;
     globalError = true;
     errorMessage = "Error: " + message;
     emscripten_run_script(("console.log(\"Error: " + message + "\");").c_str());
@@ -36,6 +38,65 @@ char* copyString(std::string in) {
     char* out = (char*)calloc(in.length() + 1, 1);
     strcpy(out, in.c_str());
     return out;
+}
+const char* syntaxNames[] = { "null","number","variable","comment","error","bracket","operator","string","command","space","escape","null","errorop","undefined","builtin","custom","argument","unit","local" };
+std::string syntax(std::string in) {
+    const char* input = in.c_str();
+    char* high = highlightSyntax(input);
+    char* adv = advancedHighlight(input, high, false, NULL, NULL);
+    free(high);
+    char* out = (char*)calloc(100, 1);
+    int outSize = 100;
+    int outLen = 0;
+    int i = 0;
+    int prev = -1;
+    int len = strlen(input);
+    for(i = 0;i < len;i++) {
+        if(adv[i] != prev && adv[i] != 9) {
+            char toAdd[50];
+            int addLen = 0;
+            if(prev != -1) {
+                memcpy(toAdd + addLen, "</span>", 7);
+                addLen += 7;
+            }
+            memcpy(toAdd + addLen, "<span class='syn-", 17);
+            addLen += 17;
+            const char* type = syntaxNames[adv[i]];
+            int typeLen = strlen(type);
+            memcpy(toAdd + addLen, type, typeLen);
+            addLen += typeLen;
+            memcpy(toAdd + addLen, "'>", 2);
+            addLen += 2;
+            if(addLen + outLen > outSize - 1) {
+                out = (char*)realloc(out, outSize + 100);
+                memset(out + outSize, 0, 100);
+                outSize += 100;
+            }
+            memcpy(out + outLen, toAdd, addLen);
+            outLen += addLen;
+            prev = adv[i];
+        }
+        char toAdd[10];
+        if(input[i] == ' ') strcpy(toAdd, "&nbsp;");
+        else if(input[i] == '>') strcpy(toAdd, "&gt;");
+        else if(input[i] == '<') strcpy(toAdd, "&lt;");
+        else {
+            toAdd[0] = input[i];
+            toAdd[1] = 0;
+        }
+        int addLen = strlen(toAdd);
+        if(outLen + addLen >= outSize - 1) {
+            out = (char*)realloc(out, outSize + 100);
+            memset(out + outSize, 0, 100);
+            outSize += 100;
+        }
+        memcpy(out + outLen, toAdd, addLen);
+        outLen += addLen;
+    }
+    free(adv);
+    std::string outStr = std::string(out);
+    free(out);
+    return outStr + "</span>";
 }
 #pragma endregion
 #pragma region Graphing
@@ -240,11 +301,11 @@ std::string runLineJS(std::string line) {
             return "";
         }
         else if(input[1] == 'p' && input[2] == 'a' && input[3] == 'r' && input[4] == 's' && input[5] == 'e') {
-            char* cleanInput = inputClean(input+6);
-            Tree tree=generateTree(cleanInput,nullptr,0.0);
+            char* cleanInput = inputClean(input + 6);
+            Tree tree = generateTree(cleanInput, nullptr, 0.0);
             free(cleanInput);
             if(globalError) return errorMessage;
-            char* outStr = treeToString(tree,false, nullptr);
+            char* outStr = treeToString(tree, false, nullptr);
             freeTree(tree);
             if(globalError) return errorMessage;
             std::string outStdStr = std::string(outStr);
@@ -349,4 +410,5 @@ EMSCRIPTEN_BINDINGS(Functions) {
     function("runLine", &runLineJS);
     function("setVerbose", &setVerboseJS);
     function("eqToWebGL", &eqToWebGL);
+    function("syntax", &syntax);
 }

@@ -189,3 +189,44 @@ button {
 a {
     text-decoration:none;
 }
+button {
+    outline:none;
+}
+/* Syntax Highlighting */
+.syn-error, .syn-invalid, .syn-errorop, .syn-undefined {
+    color:#aa0000;
+}
+.syn-number {
+    color:#222222;
+    font-weight:bold;
+}
+.syn-variable, .syn-builtin {
+    color:#a58700;
+}
+.syn-operator {
+    color:#444;
+}
+.syn-command {
+    color:#519aba;
+}
+.syn-comment {
+    color:#009900;
+}
+.syn-bracket {
+    color:#000;
+}
+.syn-string {
+    color:#dd7933;
+}
+.syn-escape {
+    color:#dd9944;
+}
+.syn-custom {
+    color:rgb(48, 143, 143);
+}
+.syn-argument {
+    color:rgb(17, 155, 113);
+}
+.syn-unit {
+    color:rgb(22, 167, 89);
+}

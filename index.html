@@ -2,13 +2,13 @@
 
     <head>
         <meta charset="UTF-8">
+        <meta lang="en">
         <script src="CalcWASM.js"></script>
         <script src="Calc.js"></script>
         <title>Calc for JS</title>
         <link rel="stylesheet" href="style/Calc.css" type="text/css">
-        <link rel="stylesheet" href="" type="text/css" id="colorScheme">
+        <link rel="stylesheet" href="style/dark.css" type="text/css" id="colorScheme">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-        <meta lang="en">
     </head>
 
     <body onkeyup="keyUp(event);" onkeydown="keyDown(event);" onresize="boxResize()">
@@ -26,7 +26,7 @@
                     <button onclick="openHelp('base conversion')" class="panelButton">Base Conversion</button>
                     <button onclick="openHelp('anonymous functions')" class="panelButton">Anonymous Functions</button>
                     <button onclick="openHelp('functions')" class="panelButton">List of Functions</button>
-                    <button onclick="openHelp('units')" class="panelButton">List of Units</button>
+                    <button onclick="openHelp('unit list')" class="panelButton">List of Units</button>
                     <button onclick="openHelp('command')" class="panelButton">List of Commands</button>
                     <button onclick="openHelp('info')" class="panelButton">Info</button>
                 </div>
@@ -45,13 +45,15 @@
                 <button id="settingsBack" onclick="openPanelPage(0)">Back</button>
                 Settings:<br>
                 <input oninput="setSetting('useDarkMode',this.checked);" id="setting-darkMode" type="checkbox" name="Dark Mode">
-                <label for="setting-darkMode">Dark Mode</label>
+                <label for="setting-darkMode">Dark Mode</label><br>
+                <input oninput="setSetting('syntaxHighlight',this.checked);" id="setting-syntax" type="checkbox" name="syntax">
+                <label for="setting-syntax">Syntax Highlighting</label>
             </div>
         </div>
         <div id="box">
             <div id="boxwrapper">
                 <span id="inputContainer">
-                    <input type="text" id="input" onenter="inputOnEnter()" autocomplete="off">
+                    <div contenteditable="true" id="input" oninput="inputSyntax();" onenter="inputOnEnter()" onkeydown="inputKeyDown(event)" spellcheck="false" autocomplete="off"></div>
                 </span>
                 <span id="output">
 

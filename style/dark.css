@@ -1,4 +1,5 @@
-*:not(a) {
+@charset "UTF-8";
+body {
     color:#FFF;
 }
 body {
@@ -6,6 +7,7 @@ body {
 }
 #input {
     background:#282828;
+    color: #FFF;
 }
 #panel {
     background:#282828;
@@ -18,6 +20,7 @@ body {
 }
 button {
     background:#333;
+    color: #FFF;
 }
 a {
     color: #3333EE;
@@ -33,4 +36,23 @@ a:visited:hover {
 }
 .svgpath {
     fill:#FFF;
+}
+.error {
+    color:#FF3333;
+}
+/*Syntax Highlighting*/
+.syn-bracket {
+    color:#FFF;
+}
+.syn-number {
+    color:#FFF;
+}
+.syn-variable, .syn-builtin {
+    color:#fffb00;
+}
+.syn-error, .syn-invalid, .syn-errorop, .syn-undefined {
+    color:#FF3333;
+}
+.syn-operator {
+    color:#AAA;
 }
