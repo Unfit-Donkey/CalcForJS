@@ -155,7 +155,7 @@ std::string runLineJS(std::string line) {
         if(startsWith(input, (char*)"-quit")) {
             return "Error: Illegal command";
         }
-        if(startsWith(input, (char*)"-f")) {
+        if(startsWith(input, (char*)"-f ")) {
             return "Error: Web version does not support the file command";
         }
         char* output = runCommand(input);
