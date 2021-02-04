@@ -414,14 +414,17 @@ function openPanel(open = true) {
     }
     boxResize();
 }
+function runLine(input) {
+    return Module.runLine(input).replace(/(?:\r\n|\r|\n)/g, '<br>');
+}
 function inputOnEnter() {
     try {
-    let out = Module.runLine(getInputText());
-    if(out != "") appendHistory(input.innerHTML, out);
-    input.innerText = "";
+        let out = runLine(getInputText()).replace(/\n/g, "<br>");
+        if(out != "") appendHistory(input.innerHTML, out);
+        input.innerText = "";
     }
-    catch (e) {
-        appendHistory(input.innerHTML,"Error: A segmentation fault has been reached. Please reload the page. If you would like to, consider reporting it <a href='https://github.com/Unfit-Donkey/CalcForJS/issues'>here</a>.");
+    catch(e) {
+        appendHistory(input.innerHTML, "Error: A segmentation fault has been reached. Please reload the page. If you would like to, consider reporting it <a href='https://github.com/Unfit-Donkey/CalcForJS/issues'>here</a>.");
     }
     inputSyntax();
 }

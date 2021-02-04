@@ -152,31 +152,20 @@ std::string runLineJS(std::string line) {
     globalError = false;
     //Commands
     if(input[0] == '-') {
-        if(input[1] == 'd' && input[2] == 'e' && input[3] == 'f' && input[4] == ' ') {
-            //Define function
-            generateFunction(input + 5);
-            if(globalError) return errorMessage;
-            return "Function defined";
+        if(startsWith(input, (char*)"-quit")) {
+            return "Error: Illegal command";
         }
-        else if(input[1] == 'd' && input[2] == 'e' && input[3] == 'l' && input[4] == ' ') {
-            int strLen = strlen(input);
-            if(input[strLen - 1] == '\n') input[strLen - 1] = 0;
-            //Delete function or variable
-            for(i = 0; i < numFunctions; i++) if(customfunctions[i].name != NULL)
-                if(strcmp(input + 5, customfunctions[i].name) == 0) {
-                    std::string out = "Function '" + std::string(customfunctions[i].name) + "' has been deleted.";
-                    free(customfunctions[i].name);
-                    customfunctions[i].name = NULL;
-                    customfunctions[i].nameLen = 0;
-                    freeTree(*customfunctions[i].tree);
-                    customfunctions[i].tree = NULL;
-                    customfunctions[i].argCount = 0;
-                    return out;
-                }
-            error("Function '" + std::string(input + 5) + "' not found\n");
-            globalError = false;
+        if(startsWith(input, (char*)"-f")) {
+            return "Error: Web version does not support the file command";
         }
-        else if(input[1] == 'g' && input[2] == ' ') {
+        char* output = runCommand(input);
+        if(globalError) return errorMessage;
+        if(output != NULL) {
+            std::string out = std::string(output);
+            free(output);
+            return out;
+        }
+        else if(startsWith(input, (char*)"-g")) {
             //Graph
             char* cleanInput = inputClean(input + 3);
             if(globalError) {
@@ -188,7 +177,7 @@ std::string runLineJS(std::string line) {
             free(cleanInput);
             return "";
         }
-        else if(input[1] == 'l' && input[2] == 's') {
+        else if(startsWith(input, (char*)"-ls")) {
             //ls lists all user-defined functions
             int num = 0;
             std::string out = "";
@@ -215,56 +204,7 @@ std::string runLineJS(std::string line) {
             out += std::string("There ") + std::string(num == 1 ? "is " : "are ") + std::to_string(num) + std::string(" user-defined function") + std::string(num == 1 ? "" : "s") + std::string(".");
             return out;
         }
-        else if(input[1] == 'd' && input[2] == 'x' && input[3] == ' ') {
-            char* cleanInput = inputClean(input + 4);
-            if(globalError) {
-                globalError = false;
-                return errorMessage;
-            }
-            char** x = (char**)calloc(2, sizeof(char**));
-            x[0] = (char*)calloc(2, 1);
-            x[0][0] = 'x';
-            Tree ops = generateTree(cleanInput, x, 0);
-            free(cleanInput);
-            Tree cleanedOps = treeCopy(ops, NULL, true, false, true);
-            Tree dx = derivative(cleanedOps);
-            Tree dxClean = treeCopy(dx, NULL, false, false, true);
-            char* out = treeToString(dxClean, false, x);
-            free(x[0]);
-            free(x);
-            std::string outString = "= " + std::string(out);
-            free(out);
-            freeTree(cleanedOps);
-            freeTree(ops);
-            freeTree(dxClean);
-            freeTree(dx);
-            return outString;
-        }
-        else if(input[1] == 'b' && input[2] == 'a' && input[3] == 's' && input[4] == 'e') {
-            //format: -base(16) 46 will return 2E
-            int i, expStart = 0;
-            for(i = 5;i < strlen(input);i++) if(input[i] == ' ') {
-                expStart = i + 1;
-                input[i] = '\0';
-                break;
-            }
-            Value base = calculate(input + 5, 0);
-            if(base.r > 36 || base.r < 1) {
-                globalError = false;
-                return "Error: base out of bounds";
-            }
-            Value out = calculate(input + expStart, 0);
-            if(globalError) return errorMessage;
-            appendToHistory(out, base.r, true);
-        }
-        else if(input[1] == 'd' && input[2] == 'e' && input[3] == 'g' && input[4] == 's' && input[5] == 'e' && input[6] == 't' && input[7] == ' ') {
-            if(input[8] == 'r' && input[9] == 'a' && input[10] == 'd') degrat = 1;
-            else if(input[8] == 'd' && input[9] == 'e' && input[10] == 'g') degrat = M_PI / 180;
-            else if(input[8] == 'g' && input[9] == 'r' && input[10] == 'a' && input[11] == 'd') degrat = M_PI / 200;
-            else degrat = getR(calculate(input + 7, 0));
-            printf("Degree ratio set to %g\n", degrat);
-        }
-        else if(input[1] == 'u' && input[2] == 'n' && input[3] == 'i' && input[4] == 't') {
+        else if(startsWith(input, (char*)"-unit")) {
             int i, unitStart = 0;
             for(i = 5;i < strlen(input);i++) if(input[i] == ' ') {
                 unitStart = i + 1;
@@ -290,7 +230,7 @@ std::string runLineJS(std::string line) {
             freeValue(out);
             return outString;
         }
-        else if(input[1] == 'h' && input[2] == 'e' && input[3] == 'l' && input[4] == 'p') {
+        else if(startsWith(input, (char*)"-help")) {
             if(input[5] == ' ') {
                 std::string call = ("helpSearch(\"" + std::string(input).substr(6) + "\",null,true)");
                 emscripten_run_script(("console.log('" + call + "');").c_str());
@@ -299,18 +239,6 @@ std::string runLineJS(std::string line) {
             }
             emscripten_run_script("openPanelPage(0)");
             return "";
-        }
-        else if(input[1] == 'p' && input[2] == 'a' && input[3] == 'r' && input[4] == 's' && input[5] == 'e') {
-            char* cleanInput = inputClean(input + 6);
-            Tree tree = generateTree(cleanInput, nullptr, 0.0);
-            free(cleanInput);
-            if(globalError) return errorMessage;
-            char* outStr = treeToString(tree, false, nullptr);
-            freeTree(tree);
-            if(globalError) return errorMessage;
-            std::string outStdStr = std::string(outStr);
-            free(outStr);
-            return outStdStr;
         }
         else {
             return "Error: command not recognized.";
