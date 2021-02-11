@@ -422,7 +422,6 @@ function runLine(input) {
 function inputOnEnter() {
     try {
         let out = runLine(getInputText()).replace(/\n/g, "<br>");
-        console.log(input.innerHTML);
         if(out != "") appendHistory(getInputAsHTML(), out);
         input.innerText = "";
     }

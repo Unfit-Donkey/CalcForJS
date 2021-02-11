@@ -6,14 +6,19 @@ body {
     background:#222;
 }
 #input {
-    background:#282828;
+    background:#2D2D2D;
+    box-shadow: 0px 0px 3px 1px #00000055;
     color: #FFF;
+    caret-color:#FFF;
 }
 #panel {
     background:#282828;
 }
 .buttonList > button {
-    background: #333;
+    background: #303030;
+}
+.menuOpenButton {
+    background:#3A3A3A;
 }
 #helpSearchBox {
     background: #333;
@@ -36,6 +41,9 @@ a:visited:hover {
 }
 .svgpath {
     fill:#FFF;
+}
+.backButton {
+    background:#333;
 }
 .error {
     color:#FF3333;
