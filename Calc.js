@@ -535,7 +535,7 @@ function getSetting(name) {
         out = localStorage.getItem(name);
         settingCache[name] = out;
     }
-    if(typeof out === "undefined" || out == "undefined") {
+    if(typeof out === "undefined" || out == "undefined"|| out==null) {
         out = settingDefaults[name];
         settingCache[name] = out;
         return out;
