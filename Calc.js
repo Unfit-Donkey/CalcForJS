@@ -499,8 +499,9 @@ function appendHistory(input, outputText) {
         hist.classList.add("errorItem");
         outputText = "<span class='error'>" + outputText + "</span>";
     }
-    if(input.startsWith("//") || input.startsWith("#")) {
-        hist.innerHTML = outputText + "<br>";
+    console.log(input);
+    if(input.startsWith("//") || input.startsWith("#") || input.startsWith("<span class=\"syn-comment\"")) {
+        hist.innerHTML = "<span class='syn-comment'>" + outputText + "</span><br>";
     }
     else hist.innerHTML = input + "<br>" + outputText + "<br>";
     //append to document
