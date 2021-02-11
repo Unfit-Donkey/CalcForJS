@@ -16,7 +16,7 @@ user-scalable=no">
     <body onkeyup="keyUp(event);" onkeydown="keyDown(event);" onresize="boxResize()">
         <div id="panel">
             <div id="mainHelp" class="panelPage" style="display:block">
-                <button class="backButton" onclick="openPanel(false)">Close</button><br>
+                <button class="backButton" onclick="openPanel(false)" class="backButton">Close</button><br>
                 Help Menu<br>
                 <div class="buttonList">
                     <button class="panelButton"
@@ -35,16 +35,16 @@ user-scalable=no">
 
             </div>
             <div id="helpSubPage" class="panelPage">
-                <button id="helpSubPageBack" onclick="openPanelPage(0)">Back</button>
+                <button id="helpSubPageBack" onclick="openPanelPage(0)" class="backButton">Back</button>
                 <div id="helpPageContent"></div>
             </div>
             <div id="helpSearch" class="panelPage">
-                <button onclick="openPanelPage(0)">Back</button> Search Menu<br>
+                <button onclick="openPanelPage(0)" class="backButton">Back</button> Search Menu<br>
                 <input type="text" class="panelButton" id="helpSearchBox" onkeyup="helpSearch(this.value,event)">
                 <div id="helpSearchResults" class="buttonList"></div>
             </div>
             <div id="settingsPage" class="panelPage">
-                <button id="settingsBack" onclick="openPanelPage(0)">Back</button>
+                <button id="settingsBack" onclick="openPanel(false);" class="backButton">Close</button>
                 Settings:<br>
                 <input oninput="setSetting('useDarkMode',this.checked);" id="setting-darkMode" type="checkbox" name="Dark Mode">
                 <label for="setting-darkMode">Dark Mode</label><br>

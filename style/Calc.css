@@ -193,6 +193,13 @@ a {
 button {
     outline:none;
 }
+.backButton {
+    border-radius: 4px;
+    font-size:1.1em;
+    padding:0.25em 0.5em 0.25em 0.5em;
+    box-shadow:0px 0px 4px 0px #00000033;
+    min-width:7ch;
+}
 /* Syntax Highlighting */
 .syn-error, .syn-invalid, .syn-errorop, .syn-undefined {
     color:#aa0000;
