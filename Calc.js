@@ -422,7 +422,8 @@ function runLine(input) {
 function inputOnEnter() {
     try {
         let out = runLine(getInputText()).replace(/\n/g, "<br>");
-        if(out != "") appendHistory(input.innerHTML, out);
+        console.log(input.innerHTML);
+        if(out != "") appendHistory(getInputAsHTML(), out);
         input.innerText = "";
     }
     catch(e) {
@@ -482,6 +483,7 @@ function boxResize() {
         if(box.classList.contains("mobile")) box.classList.remove("mobile");
     }
     box.style.width = width + "px";
+    box.style.paddingLeft = document.getElementById("panel").clientWidth;
 }
 var output, input, glContext;
 function appendHistory(input, outputText) {
@@ -535,7 +537,7 @@ function getSetting(name) {
         out = localStorage.getItem(name);
         settingCache[name] = out;
     }
-    if(typeof out === "undefined" || out == "undefined"|| out==null) {
+    if(typeof out === "undefined" || out == "undefined" || out == null) {
         out = settingDefaults[name];
         settingCache[name] = out;
         return out;
@@ -672,6 +674,10 @@ function getTextSegments(input) {
 function getInputText() {
     const replaceNBSP = new RegExp(String.fromCharCode(160), "g");
     return input.textContent.replace(replaceNBSP, " ");
+}
+function getInputAsHTML() {
+    if(getSetting("syntaxHighlight")) return input.innerHTML;
+    else return input.innerText.replace(/\n/g, "<br>").replace(/(<br>)+/g, "<br>").replace(/<br>$/, "");
 }
 async function inputSyntax() {
     if(getSetting("syntaxHighlight") == false) return;

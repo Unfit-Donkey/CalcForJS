@@ -9,6 +9,8 @@
         <link rel="stylesheet" href="style/Calc.css" type="text/css">
         <link rel="stylesheet" href="style/dark.css" type="text/css" id="colorScheme">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,
+user-scalable=no">
     </head>
 
     <body onkeyup="keyUp(event);" onkeydown="keyDown(event);" onresize="boxResize()">
@@ -53,7 +55,7 @@
         <div id="box">
             <div id="boxwrapper">
                 <span id="inputContainer">
-                    <div contenteditable="true" id="input" oninput="inputSyntax();" onenter="inputOnEnter()" onkeydown="inputKeyDown(event)" spellcheck="false" autocomplete="off"></div>
+                    <div contenteditable="true" id="input" oninput="inputSyntax();" onenter="inputOnEnter()" onkeydown="inputKeyDown(event);" spellcheck="false" autocomplete="off"></div>
                 </span>
                 <span id="output">
 

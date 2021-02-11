@@ -1,6 +1,7 @@
 body {
     margin:0px;
     text-align:center;
+    overflow-x: hidden;
 }
 button {
     box-shadow: 1px 1px 3px 0px #00000033;
@@ -44,18 +45,16 @@ button {
 }
 #box {
     text-align:left;
-    display:inline-block;
-    height:100vh;
+    display:inline-flex;
     box-sizing:content-box;
-    position:fixed;
-    right:0px;
+    justify-content:center;
 }
 #boxwrapper {
     margin: 0 auto;
     max-width:40em;
     box-sizing:content-box;
-    max-height:100vh;
-    overflow-y:auto;
+    width:100vw;
+    min-width:10em;
 }
 .mobile > #boxwrapper {
     max-width:100%;
@@ -88,7 +87,7 @@ button {
 #panel {
     padding:1em;
     width:35vw;
-    min-width:4in;
+    min-width:calc(min(4in,100vw));
     max-width:30em;
     font-family:"Roboto Mono";
     position:fixed;
@@ -101,6 +100,7 @@ button {
     text-align:left;
     box-shadow: 1px 1px 10px 5px #00000033;
     display:none;
+    z-index:10;
 }
 .panelPage {
     width:100%;
@@ -185,6 +185,7 @@ button {
     vertical-align:bottom;
     overflow:hidden;
     box-shadow:-1px -1px 3px 0px #00000033;
+    z-index:20;
 }
 a {
     text-decoration:none;
