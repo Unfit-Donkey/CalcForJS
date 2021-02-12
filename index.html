@@ -21,6 +21,7 @@ user-scalable=no">
                 <div class="buttonList">
                     <button class="panelButton"
                             onclick="helpSearch(document.getElementById('helpSearchBox').value);"><strong>Search</strong></button>
+                    <button onclick="openHelp('getting started')" class="panelButton">Getting Started</button>
                     <button onclick="openHelp('number')" class="panelButton">Numbers</button>
                     <button onclick="openHelp('operator')" class="panelButton">Operators</button>
                     <button onclick="openHelp('vectors')" class="panelButton">Vectors</button>
@@ -32,7 +33,6 @@ user-scalable=no">
                     <button onclick="openHelp('command')" class="panelButton">List of Commands</button>
                     <button onclick="openHelp('info')" class="panelButton">Info</button>
                 </div>
-
             </div>
             <div id="helpSubPage" class="panelPage">
                 <button id="helpSubPageBack" onclick="openPanelPage(0)" class="backButton">Back</button>
@@ -58,7 +58,9 @@ user-scalable=no">
                     <div contenteditable="true" id="input" oninput="inputSyntax();" onenter="inputOnEnter()" onkeydown="inputKeyDown(event);" spellcheck="false" autocomplete="off"></div>
                 </span>
                 <span id="output">
-
+                    <div class='errorItem'>
+                        Type an expression into the box or see the <a href="javascript:openHelp('getting started')">getting started guide</a>.
+                    </div>
                 </span>
             </div>
         </div>
