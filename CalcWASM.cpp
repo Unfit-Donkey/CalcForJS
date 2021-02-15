@@ -103,6 +103,11 @@ std::string syntax(std::string in) {
 int aVal = 0;
 std::string GLScript;
 std::string treeToWebGL(Tree tree) {
+    if(tree.optype == optype_localvar) {
+        tree.value = globalLocalVariableValues[tree.op];
+        tree.op = op_val;
+        tree.optype = optype_builtin;
+    }
     if(tree.op == -1) {
         return "vx";
     }
@@ -137,7 +142,7 @@ std::string eqToWebGL(std::string eq) {
     char** x = (char**)calloc(2, sizeof(char*));
     x[0] = (char*)calloc(2, 1);
     x[0][0] = 'x';
-    Tree tree = generateTree(eqChar, x, 0);
+    Tree tree = generateTree(eqChar, x, globalLocalVariables, 0);
     free(eqChar);
     free(x);
     std::string webGL = treeToWebGL(tree);
@@ -176,59 +181,6 @@ std::string runLineJS(std::string line) {
             //graphEquation(cleanInput, -10, 10, 10, -10, 20, 50);
             free(cleanInput);
             return "";
-        }
-        else if(startsWith(input, (char*)"-ls")) {
-            //ls lists all user-defined functions
-            int num = 0;
-            std::string out = "";
-            for(i = 0; i < numFunctions; i++) {
-                if(customfunctions[i].nameLen == 0) continue;
-                num++;
-                char* equation = treeToString(*(customfunctions[i].tree), false, customfunctions[i].argNames);
-                //Print name
-                out += customfunctions[i].name;
-                //Print arguments (if it has them)
-                if(customfunctions[i].argNames != NULL) {
-                    out += "(";
-                    int j;
-                    for(j = 0;j < customfunctions[i].argCount;j++) {
-                        if(j != 0) out += ',';
-                        out += std::string(customfunctions[i].argNames[j]);
-                    }
-                    out += ")";
-                }
-                //Print equation
-                out += " = " + std::string(equation) + "<br>";
-                free(equation);
-            }
-            out += std::string("There ") + std::string(num == 1 ? "is " : "are ") + std::to_string(num) + std::string(" user-defined function") + std::string(num == 1 ? "" : "s") + std::string(".");
-            return out;
-        }
-        else if(startsWith(input, (char*)"-unit")) {
-            int i, unitStart = 0;
-            for(i = 5;i < strlen(input);i++) if(input[i] == ' ') {
-                unitStart = i + 1;
-                input[i] = '\0';
-                break;
-            }
-            Value unit = calculate(input + 5, 10);
-            Value value = calculate(input + unitStart, 0);
-            if(unit.u != value.u) {
-                char* unitOne = toStringUnit(unit.u);
-                char* unitTwo = toStringUnit(value.u);
-                std::string out = "Error: units " + std::string(unitOne) + " and " + std::string(unitTwo) + " are not compatible";
-                free(unitOne);
-                free(unitTwo);
-                return out;
-            }
-            Value out = valDivide(value, unit);
-            char* numString = valueToString(out, 10);
-            std::string outString = "= " + std::string(numString) + " " + std::string(input + 5);
-            free(numString);
-            freeValue(unit);
-            freeValue(value);
-            freeValue(out);
-            return outString;
         }
         else if(startsWith(input, (char*)"-help")) {
             if(input[5] == ' ') {
@@ -314,12 +266,24 @@ std::string runLineJS(std::string line) {
     }
     //Else compute it as a value
     else {
+        int eqPos=isLocalVariableStatement(input);
+        if(eqPos!=0) {
+            Value out = calculate(input + eqPos + 1, 0);
+            if(globalError) return errorMessage;
+            char* name = (char*)calloc(eqPos + 1, 1);
+            memcpy(name, input, eqPos);
+            appendGlobalLocalVariable(name, out);
+            char* output = valueToString(out, 10);
+            std::string outputStr= "<span class='syn-local'>"+std::string(name)+"</span><span class='syn-command'>=</span>"+syntax(std::string(output));
+            free(output);
+            return outputStr;
+        }
         Value out = calculate(input, 0);
         if(!globalError) {
             appendToHistory(out, 10, false);
             char* ansString = valueToString(out, 10);
             freeValue(out);
-            std::string out = "$" + std::to_string(historyCount - 1) + " = " + std::string(ansString);
+            std::string out = "$" + std::to_string(historyCount - 1) + " = " + syntax(std::string(ansString));
             free(ansString);
             return out;
         }

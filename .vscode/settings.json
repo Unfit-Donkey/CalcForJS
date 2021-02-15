@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.txt": "markdown",
+        "system_error": "cpp"
+    }
+}
