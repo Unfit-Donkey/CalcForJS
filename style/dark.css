@@ -49,18 +49,24 @@ a:visited:hover {
     color:#FF3333;
 }
 /*Syntax Highlighting*/
-.syn-bracket {
+.syn-brack {
     color:#FFF;
 }
-.syn-number {
+.syn-num-- {
     color:#FFF;
 }
-.syn-variable, .syn-builtin {
+.syn-var--, .syn-built {
     color:#fffb00;
 }
-.syn-error, .syn-invalid, .syn-errorop, .syn-undefined {
+.syn-error, .syn-errop, .syn-undef {
     color:#FF3333;
 }
-.syn-operator {
+.syn-op--- {
     color:#AAA;
+}
+.syn-delim {
+    color:#CCC;
+}
+.syn-ctrl- {
+    color: rgb(207, 18, 207);
 }

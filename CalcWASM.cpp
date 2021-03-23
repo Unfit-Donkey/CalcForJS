@@ -2,7 +2,13 @@
 #include <emscripten/bind.h>
 #include <string.h>
 #include <stdarg.h>
-#include "CalcCLI/Calc.h"
+extern "C" {
+#include "CalcCLI/src/general.h"
+#include "CalcCLI/src/arb.h"
+#include "CalcCLI/src/compute.h"
+#include "CalcCLI/src/functions.h"
+#include "CalcCLI/src/parser.h"
+}
 using namespace emscripten;
 #pragma region Line Printing
 std::string errorMessage;
@@ -35,16 +41,16 @@ void printLine(std::string message) {
     emscripten_run_script(("console.log(\"" + message + "\");").c_str());
 }
 char* copyString(std::string in) {
-    char* out = (char*)calloc(in.length() + 1, 1);
+    char* out = (char*)malloc(in.length() + 1);
     strcpy(out, in.c_str());
     return out;
 }
-const char* syntaxNames[] = { "null","number","variable","comment","error","bracket","operator","string","command","space","escape","null","errorop","undefined","builtin","custom","argument","unit","local" };
+const char* syntaxNames[] = { "null-","num--","var--","comnt","error","brack","op---","string","comnd","space","escp-","delim","errop","undef","built","custm","arg--","unit-","local","ctrl-" };
 std::string syntax(std::string in) {
-    const char* input = in.c_str();
-    char* high = highlightSyntax(input);
-    char* adv = advancedHighlight(input, high, false, NULL, NULL);
-    free(high);
+    const char* inputcstr = in.c_str();
+    char input[strlen(inputcstr) + 1];
+    strcpy(input, inputcstr);
+    char* colors = highlightLine(input);
     char* out = (char*)calloc(100, 1);
     int outSize = 100;
     int outLen = 0;
@@ -52,48 +58,25 @@ std::string syntax(std::string in) {
     int prev = -1;
     int len = strlen(input);
     for(i = 0;i < len;i++) {
-        if(adv[i] != prev && adv[i] != 9) {
-            char toAdd[50];
-            int addLen = 0;
+        if(colors[i] != prev && colors[i] != 9) {
             if(prev != -1) {
-                memcpy(toAdd + addLen, "</span>", 7);
-                addLen += 7;
+                memcpy(out + outLen, "</span>", 7);
+                outLen += 7;
             }
-            memcpy(toAdd + addLen, "<span class='syn-", 17);
-            addLen += 17;
-            const char* type = syntaxNames[adv[i]];
-            int typeLen = strlen(type);
-            memcpy(toAdd + addLen, type, typeLen);
-            addLen += typeLen;
-            memcpy(toAdd + addLen, "'>", 2);
-            addLen += 2;
-            if(addLen + outLen > outSize - 1) {
-                out = (char*)realloc(out, outSize + 100);
-                memset(out + outSize, 0, 100);
-                outSize += 100;
-            }
-            memcpy(out + outLen, toAdd, addLen);
-            outLen += addLen;
-            prev = adv[i];
+            memcpy(out + outLen, "<span class='syn-00000'>", 24);
+            memcpy(out + outLen + 17, syntaxNames[colors[i]], 5);
+            outLen += 24;
+            prev = colors[i];
         }
-        char toAdd[10];
-        if(input[i] == ' ') strcpy(toAdd, "&nbsp;");
-        else if(input[i] == '>') strcpy(toAdd, "&gt;");
-        else if(input[i] == '<') strcpy(toAdd, "&lt;");
+        if(input[i] == ' ') { memcpy(out + outLen, "&nbsp;", 6);outLen += 6; }
+        else if(input[i] == '>') { memcpy(out + outLen, "&gt;", 4);outLen += 4; }
+        else if(input[i] == '<') { memcpy(out + outLen, "&lt;", 4);outLen += 4; }
         else {
-            toAdd[0] = input[i];
-            toAdd[1] = 0;
+            out[outLen] = input[i];
+            outLen += 1;
         }
-        int addLen = strlen(toAdd);
-        if(outLen + addLen >= outSize - 1) {
-            out = (char*)realloc(out, outSize + 100);
-            memset(out + outSize, 0, 100);
-            outSize += 100;
-        }
-        memcpy(out + outLen, toAdd, addLen);
-        outLen += addLen;
+        if(outLen > outSize - 40) out = (char*)recalloc(out, &outSize, 100, 1);
     }
-    free(adv);
     std::string outStr = std::string(out);
     free(out);
     return outStr + "</span>";
@@ -166,20 +149,25 @@ std::string runLineJS(std::string line) {
         char* output = runCommand(input);
         if(globalError) return errorMessage;
         if(output != NULL) {
-            std::string out = std::string(output);
+            std::string out;
+            if(output[0] == '$') {
+                std::string stdString = std::string(output);
+                int eqPos = findNext(output, 0, '=');
+                out = stdString.substr(0, eqPos + 1) + syntax(stdString.substr(eqPos + 1, strlen(output) - eqPos - 1));
+            }
+            else out = std::string(output);
             free(output);
             return out;
         }
         else if(startsWith(input, (char*)"-g")) {
             //Graph
-            char* cleanInput = inputClean(input + 3);
+            inputClean(input + 3);
             if(globalError) {
                 globalError = false;
                 return errorMessage;
             }
-            emscripten_run_script((std::string("graphs.push(new GLprog(\"") + std::string(cleanInput) + std::string("\"));drawGraph();")).c_str());
-            //graphEquation(cleanInput, -10, 10, 10, -10, 20, 50);
-            free(cleanInput);
+            emscripten_run_script((std::string("graphs.push(new GLprog(\"") + std::string(input + 3) + std::string("\"));drawGraph();")).c_str());
+            //graphEquation(input+3, -10, 10, 10, -10, 20, 50);
             return "";
         }
         else if(startsWith(input, (char*)"-help")) {
@@ -266,17 +254,17 @@ std::string runLineJS(std::string line) {
     }
     //Else compute it as a value
     else {
-        int eqPos=isLocalVariableStatement(input);
-        if(eqPos!=0) {
+        int eqPos = isLocalVariableStatement(input);
+        if(eqPos != 0) {
             Value out = calculate(input + eqPos + 1, 0);
             if(globalError) return errorMessage;
             char* name = (char*)calloc(eqPos + 1, 1);
             memcpy(name, input, eqPos);
             appendGlobalLocalVariable(name, out);
             char* output = valueToString(out, 10);
-            std::string outputStr= "<span class='syn-local'>"+std::string(name)+"</span><span class='syn-command'>=</span>"+syntax(std::string(output));
+            std::string outStr = syntax(output);
             free(output);
-            return outputStr;
+            return outStr;
         }
         Value out = calculate(input, 0);
         if(!globalError) {
@@ -291,16 +279,12 @@ std::string runLineJS(std::string line) {
     }
     return "Error: internal - how did we get here?";
 }
-void setVerboseJS(int v) {
-    verbose = v;
-}
 int main() {
     startup();
     return 0;
 }
 EMSCRIPTEN_BINDINGS(Functions) {
     function("runLine", &runLineJS);
-    function("setVerbose", &setVerboseJS);
     function("eqToWebGL", &eqToWebGL);
     function("syntax", &syntax);
 }

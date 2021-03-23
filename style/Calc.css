@@ -207,43 +207,49 @@ button {
     background:#E0E0E030;
 }
 /* Syntax Highlighting */
-.syn-error, .syn-invalid, .syn-errorop, .syn-undefined {
+.syn-error, .syn-errop, .syn-undef {
     color:#aa0000;
 }
-.syn-number {
+.syn-num-- {
     color:#222222;
     font-weight:bold;
 }
-.syn-variable, .syn-builtin {
+.syn-var--, .syn-built {
     color:#a58700;
 }
-.syn-operator {
+.syn-op--- {
     color:#444;
 }
-.syn-command {
+.syn-comnd {
     color:#519aba;
 }
-.syn-comment {
+.syn-comnt {
     color:#009900;
 }
-.syn-bracket {
+.syn-brack {
     color:#000;
 }
 .syn-string {
     color:#dd7933;
 }
-.syn-escape {
+.syn-escp- {
     color:#dd9944;
 }
-.syn-custom {
+.syn-custm {
     color:rgb(48, 143, 143);
 }
-.syn-argument {
+.syn-arg-- {
     color:rgb(17, 155, 113);
 }
-.syn-unit {
+.syn-unit- {
     color:rgb(22, 167, 89);
 }
 .syn-local {
     color: rgb(41, 124, 202);
+}
+.syn-delim {
+    color: rgb(30,30,30);
+}
+.syn-ctrl- {
+    color:rgb(133, 19, 133);
 }
