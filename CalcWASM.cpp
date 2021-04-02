@@ -8,6 +8,7 @@ extern "C" {
 #include "CalcCLI/src/compute.h"
 #include "CalcCLI/src/functions.h"
 #include "CalcCLI/src/parser.h"
+#include "CalcCLI/src/help.h"
 }
 using namespace emscripten;
 #pragma region Line Printing
@@ -134,6 +135,50 @@ std::string eqToWebGL(std::string eq) {
     return out;
 }
 #pragma endregion
+#pragma region Help Pages
+std::string getHelpContent(int id) {
+    std::string content;
+    if(pages[id].type == 8) {
+        char* generatedContent = getGeneratedPage(pages[id]);
+        content = std::string(generatedContent);
+        free(generatedContent);
+    }
+    else content = std::string(pages[id].content);
+    std::string header = "<h2>" + std::string(pages[id].name);
+    if(pages[id].symbol) header += " - " + std::string(pages[id].symbol);
+    header += "</h2>";
+    return header + content;
+}
+std::string pageToSearchEntry(int id) {
+    std::string out = "<button class='searchResult' onclick='openHelp(\"" + std::string(pages[id].name) + "\")'>";
+    out += std::string(pages[id].name);
+    if(pages[id].symbol) out += " - " + std::string(pages[id].symbol);
+    out += "<span class='searchResultTags'>";
+    if(pages[id].type != 0 && pages[id].type != 8) out += std::string(pageTypes[pages[id].type]) + "<br>";
+    return out + "</span></button>";
+}
+std::string getSearchHTML(std::string query) {
+    int* results = searchHelpPages(query.c_str());
+    if(results[0] == -1) {
+        return "No results";
+    }
+    int resultCount = 0;
+    while(results[resultCount] != -1) resultCount++;
+    if(resultCount > 10) resultCount = 10;
+    std::string out = "";
+    for(int i = 0;i < resultCount;i++) {
+        out += pageToSearchEntry(results[i]);
+    }
+    free(results);
+    return out;
+}
+int bestHelpPageMatch(std::string query) {
+    int* results = searchHelpPages(query.c_str());
+    int out = results[0];
+    free(results);
+    return out;
+}
+#pragma endregion
 std::string runLineJS(std::string line) {
     char* input = copyString(line);
     int i;
@@ -173,7 +218,6 @@ std::string runLineJS(std::string line) {
         else if(startsWith(input, (char*)"-help")) {
             if(input[5] == ' ') {
                 std::string call = ("helpSearch(\"" + std::string(input).substr(6) + "\",null,true)");
-                emscripten_run_script(("console.log('" + call + "');").c_str());
                 emscripten_run_script(call.c_str());
                 return "";
             }
@@ -287,4 +331,7 @@ EMSCRIPTEN_BINDINGS(Functions) {
     function("runLine", &runLineJS);
     function("eqToWebGL", &eqToWebGL);
     function("syntax", &syntax);
+    function("bestHelpPageMatch", &bestHelpPageMatch);
+    function("getSearchHTML", &getSearchHTML);
+    function("getHelpContent", &getHelpContent);
 }
