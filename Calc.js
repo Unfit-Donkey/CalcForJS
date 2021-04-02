@@ -14,7 +14,7 @@ function openHelp(name) {
     if(panelPage != 1) openPanelPage(1);
     //Replace syntax tags
     let syn = document.getElementsByTagName("syntax");
-    for(let i = 0; i < syn.length; i++) syn[i].innerHTML = getSyntax(syn[i].textContent);
+    for(let i = 0; i < syn.length; i++) syn[i].innerHTML = getSyntax(syn[i].textContent).replace(/undef/g,"arg--");
     //Replace help tags
     let help = document.getElementsByTagName("help");
     for(let i = help.length - 1; i > -1; i--) {
