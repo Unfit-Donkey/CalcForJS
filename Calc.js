@@ -14,7 +14,7 @@ function openHelp(name) {
     if(panelPage != 1) openPanelPage(1);
     //Replace syntax tags
     let syn = document.getElementsByTagName("syntax");
-    for(let i = 0; i < syn.length; i++) syn[i].innerHTML = getSyntax(syn[i].textContent).replace(/undef/g,"arg--");
+    for(let i = 0; i < syn.length; i++) syn[i].innerHTML = getSyntax(syn[i].textContent).replace(/undef/g, "arg--");
     //Replace help tags
     let help = document.getElementsByTagName("help");
     for(let i = help.length - 1; i > -1; i--) {
@@ -154,6 +154,17 @@ function boxResize() {
     box.style.paddingLeft = document.getElementById("panel").clientWidth;
 }
 var output, input, glContext;
+function printStringNewLine() {
+    let curString = document.getElementById("currentString");
+    if(curString.innerText != "") {
+        let el = document.createElement("div");
+        el.classList.add("string");
+        el.innerText = curString.innerText;
+        document.getElementById("output").prepend(el);
+        curString.innerText = "";
+        //Module.resetStringPrint();
+    }
+}
 function appendHistory(input, outputText) {
     //Clear previous item if an error
     if(output) if(output.children)
@@ -175,6 +186,8 @@ function appendHistory(input, outputText) {
         hist.innerHTML = "<span class='syn-comment'>" + outputText + "</span><br>";
     }
     else hist.innerHTML = input + "<br>" + outputText + "<br>";
+    //Move current string into history
+    printStringNewLine();
     //append to document
     document.getElementById("output").prepend(hist);
 }

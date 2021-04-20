@@ -82,6 +82,42 @@ std::string syntax(std::string in) {
     free(out);
     return outStr + "</span>";
 }
+char stringPrintBuffer[10000];
+int stringPrintPos = 0;
+EM_JS(void, printStringBuffer, (const char* buffer), {
+    let string = UTF8ToString(buffer);
+    document.getElementById("currentString").innerText = string;
+    });
+EM_JS(void, printNewLine, (), {
+    printStringNewLine();
+
+    });
+void resetStringPrint() {
+    stringPrintPos = 0;
+}
+void printString(Value string) {
+    for(int i = 0;string.string[i] != 0;i++) {
+        if(string.string[i] == '\n') {
+            stringPrintBuffer[stringPrintPos] = 0;
+            printStringBuffer(stringPrintBuffer);
+            printNewLine();
+            stringPrintPos = 0;
+        }
+        else if(string.string[i] == '\r') {
+            stringPrintPos = 0;
+        }
+        else if(string.string[i] == '\t') {
+            memcpy(stringPrintBuffer + stringPrintPos, "&nbsp;&nbsp;&nbsp;&nbsp;", 24);
+            stringPrintPos += 24;
+        }
+        else {
+            stringPrintBuffer[stringPrintPos] = string.string[i];
+            stringPrintPos++;
+        }
+    }
+    stringPrintBuffer[stringPrintPos] = 0;
+    printStringBuffer(stringPrintBuffer);
+}
 #pragma endregion
 #pragma region Graphing
 int aVal = 0;
@@ -112,7 +148,8 @@ std::string treeToWebGL(Tree tree) {
         return "(" + treeToWebGL(tree.branch[0]) + opName + treeToWebGL(tree.branch[1]) + ")";
     }
     if(tree.op < 28) {
-        if(stdfunctions[tree.op].argCount == 2) {
+        const unsigned char* args = stdfunctions[tree.op].inputs;
+        if(args[0] != 0 && args[1] != 0 && args[2] == 0) {
             return std::string(stdfunctions[tree.op].name) + "(" + treeToWebGL(tree.branch[0]) + "," + treeToWebGL(tree.branch[1]) + ")";
         }
         return std::string(stdfunctions[tree.op].name) + "(" + treeToWebGL(tree.branch[0]) + ")";
@@ -334,4 +371,5 @@ EMSCRIPTEN_BINDINGS(Functions) {
     function("bestHelpPageMatch", &bestHelpPageMatch);
     function("getSearchHTML", &getSearchHTML);
     function("getHelpContent", &getHelpContent);
+    function("resetStringPrint", &resetStringPrint);
 }
