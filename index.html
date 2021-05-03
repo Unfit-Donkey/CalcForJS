@@ -46,9 +46,9 @@ user-scalable=no">
             <div id="settingsPage" class="panelPage">
                 <button id="settingsBack" onclick="openPanel(false);" class="backButton">Close</button>
                 Settings:<br>
-                <input oninput="setSetting('useDarkMode',this.checked);" id="setting-darkMode" type="checkbox" name="Dark Mode">
+                <input oninput="Module.setSetting('darkmode',this.checked?'1':'0');" id="setting-darkMode" type="checkbox" name="Dark Mode">
                 <label for="setting-darkMode">Dark Mode</label><br>
-                <input oninput="setSetting('syntaxHighlight',this.checked);" id="setting-syntax" type="checkbox" name="syntax">
+                <input oninput="Module.setSetting('color',this.checked?'1':'0');" id="setting-syntax" type="checkbox" name="syntax">
                 <label for="setting-syntax">Syntax Highlighting</label>
             </div>
         </div>

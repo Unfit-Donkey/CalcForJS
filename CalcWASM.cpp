@@ -9,6 +9,7 @@ extern "C" {
 #include "CalcCLI/src/functions.h"
 #include "CalcCLI/src/parser.h"
 #include "CalcCLI/src/help.h"
+#include "CalcCLI/src/misc.h"
 }
 using namespace emscripten;
 #pragma region Line Printing
@@ -46,7 +47,7 @@ char* copyString(std::string in) {
     strcpy(out, in.c_str());
     return out;
 }
-const char* syntaxNames[] = { "null-","num--","var--","comnt","error","brack","op---","string","comnd","space","escp-","delim","errop","undef","built","custm","arg--","unit-","local","ctrl-" };
+const char* syntaxNames[] = { "null-","num--","var--","comnt","error","brack","op---","string","comnd","space","escp-","delim","errop","undef","built","custm","arg--","unit-","local","ctrl-","hist-" };
 std::string syntax(std::string in) {
     const char* inputcstr = in.c_str();
     char input[strlen(inputcstr) + 1];
@@ -117,6 +118,49 @@ void printString(Value string) {
     }
     stringPrintBuffer[stringPrintPos] = 0;
     printStringBuffer(stringPrintBuffer);
+}
+#pragma endregion
+#pragma region Preferences
+const bool allowedPreferences[preferenceCount] = { 1,1,0,1 };
+EM_JS(void, storePref, (const char* name, const char* value), {
+    localStorage.setItem(UTF8ToString(name),UTF8ToString(value));
+    });
+//Freeing the return value will cause a SIGSEGV, don't know if it leaks or not.
+EM_JS(const char*, getPref, (const char* name), {
+    return localStorage.getItem(UTF8ToString(name));
+    });
+void loadPreferences() {
+    for(int i = 0;i < preferenceCount;i++) if(allowedPreferences[i]) {
+        const char* pref = getPref(preferences[i].name);
+        Value val;
+        if(pref[0] == 0) val = copyValue(preferences[i].defaultVal);
+        else val = calculate(pref, 10);
+        if(globalError) {
+            error("Error in %s preference", preferences[i].name);
+            globalError = false;
+        }
+        else {
+            if(setPreference(preferences[i].name, val, false) == 0) freeValue(val);
+        }
+    }
+}
+void savePreferences() {
+    for(int i = 0;i < preferenceCount;i++) if(allowedPreferences[i]) {
+        char* val = valueToString(preferences[i].current, 10);
+        storePref(preferences[i].name, val);
+        free(val);
+    }
+}
+void updatePreference(int id) {
+    //Use color
+    if(id == 0) EM_ASM({ document.getElementById("setting-syntax").checked = $0; }, getR(preferences[id].current) != 0);
+    //Dark Mode
+    if(id == 1) EM_ASM({ document.getElementById("colorScheme").href = $0 ? "style/dark.css" : "";
+    document.getElementById("setting-darkMode").checked = $0; }, getR(preferences[id].current) != 0);
+}
+void setSetting(std::string name, std::string type) {
+    Value val = calculate(type.c_str(), 10);
+    if(setPreference(name.c_str(), val, true) == 0) freeValue(val);
 }
 #pragma endregion
 #pragma region Graphing
@@ -221,7 +265,7 @@ std::string runLineJS(std::string line) {
     int i;
     globalError = false;
     //Commands
-    if(input[0] == '-') {
+    if(input[0] == '-' && input[1] >= 'a' && input[1] <= 'z') {
         if(startsWith(input, (char*)"-quit")) {
             return "Error: Illegal command";
         }
@@ -372,4 +416,5 @@ EMSCRIPTEN_BINDINGS(Functions) {
     function("getSearchHTML", &getSearchHTML);
     function("getHelpContent", &getHelpContent);
     function("resetStringPrint", &resetStringPrint);
+    function("setSetting", &setSetting);
 }

@@ -66,10 +66,6 @@ function openPanelPage(id) {
     let newActiveList = pages[id].getElementsByClassName("buttonList")[0]
     if(newActiveList) newActiveList.classList.add("activeList");
     if(!panelIsOpen) openPanel(true);
-    //Retrieve settings
-    if(id == 3) {
-        document.getElementById("setting-darkMode").value = getSetting("useDarkMode");
-    }
 }
 var panelIsOpen = false;
 var panelPage = -1;
@@ -95,6 +91,7 @@ function inputOnEnter() {
         input.innerText = "";
     }
     catch(e) {
+        console.log(e);
         appendHistory(input.innerHTML, "Error: A segmentation fault has been reached. Please reload the page. If you would like to, consider reporting it <a href='https://github.com/Unfit-Donkey/CalcForJS/issues'>here</a>.");
     }
     inputSyntax();
@@ -190,47 +187,6 @@ function appendHistory(input, outputText) {
     printStringNewLine();
     //append to document
     document.getElementById("output").prepend(hist);
-}
-function settingsLoad() {
-    for(let i in settingDefaults) {
-        setSetting(i, getSetting(i));
-    }
-}
-function setSetting(name, value) {
-    localStorage.setItem(name, value.toString());
-    settingCache[name] = value;
-    if(name == "useDarkMode") {
-        value = eval(value);
-        document.getElementById("colorScheme").href = value ? "style/dark.css" : "";
-        document.getElementById("setting-darkMode").checked = value;
-    }
-    if(name == "syntaxHighlight") {
-        value = eval(value);
-        //inputSyntax();
-        document.getElementById("setting-syntax").checked = value;
-    }
-}
-const settingDefaults = {
-    "useDarkMode": true,
-    "syntaxHighlight": true,
-};
-var settingCache = {};
-function getSetting(name) {
-    let out = settingCache[name];
-    if(out == undefined) {
-        out = localStorage.getItem(name);
-        settingCache[name] = out;
-    }
-    if(typeof out === "undefined" || out == "undefined" || out == null) {
-        out = settingDefaults[name];
-        settingCache[name] = out;
-        return out;
-    }
-    //Convert booleans from text
-    if(typeof settingDefaults != "string") {
-        out = eval(out);
-    }
-    return out;
 }
 //Graphing
 var gl;
@@ -360,11 +316,11 @@ function getInputText() {
     return input.textContent.replace(replaceNBSP, " ");
 }
 function getInputAsHTML() {
-    if(getSetting("syntaxHighlight")) return input.innerHTML;
+    if(localStorage.getItem("color") != "0") return input.innerHTML;
     else return input.innerText.replace(/\n/g, "<br>").replace(/(<br>)+/g, "<br>").replace(/<br>$/, "");
 }
 async function inputSyntax() {
-    if(getSetting("syntaxHighlight") == false) return;
+    if(localStorage.getItem("color") == "0") return;
     let syntax;
     syntax = getSyntax(getInputText());
     let range = getAbsoluteSelection();
@@ -440,5 +396,4 @@ onload = function () {
     graph = document.getElementById("graph");
     input = document.getElementById("input");
     boxResize();
-    settingsLoad();
 }
