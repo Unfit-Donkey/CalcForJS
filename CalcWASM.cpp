@@ -381,13 +381,40 @@ std::string runLineJS(std::string line) {
     else {
         int eqPos = isLocalVariableStatement(input);
         if(eqPos != 0) {
-            Value out = calculate(input + eqPos + 1, 0);
-            if(globalError) return errorMessage;
             char* name = (char*)calloc(eqPos + 1, 1);
-            memcpy(name, input, eqPos);
-            appendGlobalLocalVariable(name, out);
-            char* output = valueToString(out, 10);
-            std::string outStr = syntax(output);
+            int varIndex = -1;
+            Value out = calculate(input + eqPos + 1, 0);
+            //The name variable may be freed when appendGlobalLocalVariable is called
+            int nameEnd = eqPos;
+            std::string nameStr;
+            //Accessors
+            if(input[eqPos - 1] == ']') {
+                int bracket = 0;
+                while(input[bracket] != '[') bracket++;
+                strncpy(name, input, bracket);
+                lowerCase(name);
+                inputClean(name);
+                nameStr = std::string(name);
+                nameEnd = bracket;
+                //Create variable if it doesn't exist
+                varIndex = appendGlobalLocalVariable(name, NULLVAL, false);
+                //Calculate key
+                input[eqPos - 1] = 0;
+                Value key = calculate(input + bracket + 1, 0);
+                input[eqPos - 1] = ']';
+                //Set key
+                setKey(globalLocalVariableValues + varIndex, key, out);
+                if(globalError) { freeValue(out);return errorMessage; }
+            }
+            else {
+                strncpy(name, input, eqPos);
+                lowerCase(name);
+                inputClean(name);
+                nameStr = std::string(name);
+                varIndex = appendGlobalLocalVariable(name, out, true);
+            }
+            char* output = valueToString(globalLocalVariableValues[varIndex], 10);
+            std::string outStr = syntax(nameStr + "=" + std::string(output));
             free(output);
             return outStr;
         }
